@@ -1,26 +1,26 @@
 :root {
   color-scheme: dark;
-  --bg: #080b12;
-  --surface: #101722;
-  --surface-2: #151e2b;
-  --text: #f1f5f9;
-  --muted: #97a6b8;
-  --line: #263244;
-  --primary: #7c8cff;
-  --accent: #48e0c2;
-  --shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+  --bg: #0b1117;
+  --surface: #111a22;
+  --surface-2: #17242c;
+  --text: #f4f0e8;
+  --muted: #9baab0;
+  --line: #2a3a40;
+  --primary: #ff765f;
+  --accent: #8be0c1;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
 }
 [data-theme="light"] {
   color-scheme: light;
-  --bg: #f5f7fb;
-  --surface: #fff;
-  --surface-2: #edf1f8;
-  --text: #111827;
-  --muted: #536174;
-  --line: #d9e0ec;
-  --primary: #4f5fe6;
-  --accent: #0e9f88;
-  --shadow: 0 20px 55px rgba(37, 52, 85, 0.12);
+  --bg: #f4f0e8;
+  --surface: #fffaf2;
+  --surface-2: #e9eee8;
+  --text: #17252a;
+  --muted: #5c6a6b;
+  --line: #d6ded9;
+  --primary: #df563e;
+  --accent: #167c69;
+  --shadow: 0 20px 55px rgba(43, 61, 56, 0.12);
 }
 * {
   box-sizing: border-box;
@@ -33,7 +33,7 @@ body {
   background: var(--bg);
   color: var(--text);
   font:
-    16px/1.65 Inter,
+    16px/1.65 Manrope,
     ui-sans-serif,
     system-ui,
     -apple-system,
@@ -111,7 +111,7 @@ textarea {
   top: 0;
   z-index: 20;
   border-bottom: 1px solid transparent;
-  background: rgba(8, 11, 18, 0.58);
+  background: rgba(11, 17, 23, 0.68);
   backdrop-filter: blur(18px);
   transition: 0.25s;
 }
@@ -232,6 +232,7 @@ h3 {
 h1 {
   max-width: 10ch;
   font-size: clamp(3.5rem, 8vw, 7.3rem);
+  font-weight: 800;
 }
 h1 span {
   color: var(--primary);
@@ -273,6 +274,24 @@ h3 {
 .socials a:hover {
   color: var(--accent);
 }
+.hero-note {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 28px;
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+}
+.availability-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--accent) 15%, transparent),
+    0 0 18px var(--accent);
+}
 .button {
   display: inline-flex;
   align-items: center;
@@ -292,7 +311,7 @@ h3 {
   transform: translateY(-3px);
 }
 .button.primary {
-  background: linear-gradient(135deg, var(--primary), #a27cff);
+  background: linear-gradient(135deg, var(--primary), #f2a064);
   color: #fff;
   box-shadow: 0 12px 28px color-mix(in srgb, var(--primary) 30%, transparent);
 }
@@ -307,12 +326,22 @@ h3 {
   display: grid;
   place-items: center;
 }
+.hero-visual:before {
+  content: "01 / 04";
+  position: absolute;
+  top: 8%;
+  right: 2%;
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+}
 .photo-frame {
   position: relative;
   width: min(370px, 74vw);
   aspect-ratio: 4/5;
   border: 1px solid color-mix(in srgb, var(--primary) 70%, var(--line));
-  border-radius: 34px;
+  border-radius: 34px 34px 90px 34px;
   overflow: hidden;
   background: var(--surface);
   box-shadow: var(--shadow);
@@ -325,7 +354,7 @@ h3 {
   background: linear-gradient(
     145deg,
     transparent 45%,
-    rgba(124, 140, 255, 0.18)
+    rgba(255, 118, 95, 0.2)
   );
   pointer-events: none;
 }
@@ -383,6 +412,28 @@ h3 {
   left: 7%;
   bottom: 13%;
 }
+.visual-caption {
+  position: absolute;
+  right: 0;
+  bottom: 5%;
+  display: grid;
+  gap: 3px;
+  padding: 13px 16px;
+  border-left: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+.visual-caption span {
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: 0.64rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.visual-caption strong {
+  font-size: 0.9rem;
+}
 @keyframes float {
   50% {
     transform: translateY(-9px);
@@ -419,6 +470,40 @@ h3 {
 .about-copy p {
   margin: 0 0 20px;
 }
+.principles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.principle {
+  min-height: 220px;
+  padding: 26px;
+  border-top: 2px solid var(--primary);
+  background: linear-gradient(
+    145deg,
+    color-mix(in srgb, var(--surface) 94%, transparent),
+    color-mix(in srgb, var(--surface-2) 60%, transparent)
+  );
+}
+.principle:nth-child(2) {
+  border-color: var(--accent);
+}
+.principle span {
+  color: var(--muted);
+  font-family: "DM Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+}
+.principle h3 {
+  max-width: 12ch;
+  margin-top: 42px;
+  font-size: 1.4rem;
+}
+.principle p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
 .info-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -436,6 +521,14 @@ h3 {
     color-mix(in srgb, var(--surface-2) 60%, transparent)
   );
   box-shadow: var(--shadow);
+}
+.info-card,
+.skill-card,
+.project-card,
+.credential,
+.education-card,
+.contact-form {
+  border-radius: 8px;
 }
 .info-card {
   padding: 22px;
@@ -527,6 +620,8 @@ h3 {
 }
 .project-card h3 {
   margin-top: 30px;
+  max-width: 12ch;
+  font-size: 1.45rem;
 }
 .project-card > p {
   margin: 12px 0;
@@ -565,7 +660,7 @@ h3 {
   align-items: center;
   gap: 16px;
   padding: 22px 24px;
-  border-radius: 17px;
+  border-radius: 8px;
 }
 .credential h3 em {
   font-style: normal;
@@ -582,7 +677,7 @@ h3 {
 }
 .education-card {
   padding: 40px;
-  border-radius: 24px;
+  border-radius: 8px;
 }
 .education-line {
   display: block;
@@ -630,7 +725,7 @@ h3 {
   gap: 17px;
   padding: 28px;
   border: 1px solid var(--line);
-  border-radius: 20px;
+  border-radius: 8px;
   background: var(--surface);
   box-shadow: var(--shadow);
 }
@@ -797,7 +892,8 @@ footer {
     grid-template-columns: 1fr;
   }
   .skills-grid,
-  .projects-grid {
+  .projects-grid,
+  .principles-grid {
     grid-template-columns: repeat(2, 1fr);
   }
   .section-head {
@@ -831,6 +927,16 @@ footer {
   .photo-orbit {
     width: min(310px, 90vw);
   }
+  .visual-caption {
+    right: 0;
+    bottom: 3%;
+    max-width: 66%;
+    padding: 10px 11px;
+    font-size: 0.78rem;
+  }
+  .visual-caption span {
+    font-size: 0.56rem;
+  }
   .tech-badge {
     padding: 7px 9px;
     font-size: 0.68rem;
@@ -854,7 +960,8 @@ footer {
   }
   .skills-grid,
   .projects-grid,
-  .info-grid {
+  .info-grid,
+  .principles-grid {
     grid-template-columns: 1fr;
   }
   .credential {

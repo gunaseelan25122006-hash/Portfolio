@@ -1,149 +1,160 @@
-const root = document.documentElement,
-  header = document.querySelector(".site-header"),
-  toggle = document.querySelector(".theme-toggle"),
-  menuButton = document.querySelector(".menu-toggle"),
-  navMenu = document.querySelector(".nav-menu"),
-  progress = document.querySelector(".scroll-progress span"),
-  backTop = document.querySelector(".back-top");
-const savedTheme = localStorage.getItem("portfolio-theme");
-root.dataset.theme = savedTheme || "dark";
-function updateToggle() {
-  const dark = root.dataset.theme === "dark";
-  toggle.setAttribute(
-    "aria-label",
-    dark ? "Switch to light theme" : "Switch to dark theme",
-  );
-  toggle.querySelector(".theme-icon").textContent = dark ? "☼" : "☾";
+const root = document.documentElement;
+const toggle = document.querySelector(".theme-toggle");
+const menuButton = document.querySelector(".menu-toggle");
+const navMenu = document.querySelector(".nav-menu");
+const backTop = document.querySelector(".back-top");
+const themeColor = document.querySelector('meta[name="theme-color"]');
+
+root.classList.add("js-ready");
+
+let savedTheme = "dark";
+try {
+  const storedTheme = localStorage.getItem("portfolio-theme");
+  if (storedTheme === "dark" || storedTheme === "light") savedTheme = storedTheme;
+} catch {
+  // Keep the site usable when browser storage is unavailable.
 }
-updateToggle();
+root.dataset.theme = savedTheme;
+
+function updateThemeButton() {
+  const dark = root.dataset.theme === "dark";
+  toggle.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
+  toggle.querySelector(".theme-icon").textContent = dark ? "\u263e" : "\u2600";
+  themeColor.setAttribute("content", dark ? "#0d1420" : "#f4f6fb");
+}
+
+updateThemeButton();
 toggle.addEventListener("click", () => {
   root.dataset.theme = root.dataset.theme === "dark" ? "light" : "dark";
-  localStorage.setItem("portfolio-theme", root.dataset.theme);
-  updateToggle();
+  try {
+    localStorage.setItem("portfolio-theme", root.dataset.theme);
+  } catch {
+    // Theme switching still works for this visit without browser storage.
+  }
+  updateThemeButton();
 });
-menuButton.addEventListener("click", () => {
-  const open = navMenu.classList.toggle("open");
-  menuButton.classList.toggle("open", open);
+
+const mobileNav = window.matchMedia("(max-width: 980px)");
+
+function setMenuOpen(open) {
+  const closedOnMobile = mobileNav.matches && !open;
+  navMenu.classList.toggle("open", open);
+  navMenu.inert = closedOnMobile;
+  navMenu.setAttribute("aria-hidden", String(closedOnMobile));
   menuButton.setAttribute("aria-expanded", String(open));
-  menuButton.setAttribute(
-    "aria-label",
-    open ? "Close navigation menu" : "Open navigation menu",
-  );
-});
-document.querySelectorAll(".nav-link").forEach((link) =>
-  link.addEventListener("click", () => {
-    navMenu.classList.remove("open");
-    menuButton.classList.remove("open");
-    menuButton.setAttribute("aria-expanded", "false");
-  }),
-);
-const revealObserver = new IntersectionObserver(
-  (entries) =>
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        revealObserver.unobserve(entry.target);
-      }
-    }),
-  { threshold: 0.12 },
-);
-document
-  .querySelectorAll(".reveal")
-  .forEach((el) => revealObserver.observe(el));
-const links = [...document.querySelectorAll(".nav-link")],
-  sections = [...document.querySelectorAll("main section[id]")].filter(
-    (section) => links.some((link) => link.hash === `#${section.id}`),
-  ),
-  sectionObserver = new IntersectionObserver(
-    (entries) =>
-      entries.forEach((entry) => {
-        if (entry.isIntersecting)
-          links.forEach((link) =>
-            link.classList.toggle(
-              "active",
-              link.hash === `#${entry.target.id}`,
-            ),
-          );
-      }),
-    { rootMargin: "-35% 0px -55%" },
-  );
-sections.forEach((section) => sectionObserver.observe(section));
-function onScroll() {
-  const height = document.documentElement.scrollHeight - innerHeight;
-  progress.style.transform = `scaleX(${height ? scrollY / height : 0})`;
-  header.classList.toggle("scrolled", scrollY > 20);
-  backTop.classList.toggle("visible", scrollY > 650);
+  menuButton.setAttribute("aria-label", open ? "Close navigation menu" : "Open navigation menu");
 }
-addEventListener("scroll", onScroll, { passive: true });
-onScroll();
-backTop.addEventListener("click", () =>
-  scrollTo({ top: 0, behavior: "smooth" }),
-);
-document.querySelector("#year").textContent = new Date().getFullYear();
-document.querySelector(".contact-form").addEventListener("submit", (event) => {
-  event.preventDefault();
-  const form = event.currentTarget;
-  let valid = true;
-  form.querySelectorAll("[required]").forEach((field) => {
-    const error = field.parentElement.querySelector("small");
-    let message = "";
-    if (!field.value.trim()) message = `Please enter your ${field.name}.`;
-    else if (field.type === "email" && !field.validity.valid)
-      message = "Enter a valid email address.";
-    field.setAttribute("aria-invalid", String(Boolean(message)));
-    error.textContent = message;
-    if (message) valid = false;
-  });
-  const status = form.querySelector(".form-message");
-  status.textContent = valid
-    ? "Thanks! Please connect using the email address above."
-    : "";
-  if (valid) form.reset();
+
+setMenuOpen(false);
+menuButton.addEventListener("click", () => {
+  setMenuOpen(!navMenu.classList.contains("open"));
 });
-if (
-  window.matchMedia(
-    "(pointer:fine) and (prefers-reduced-motion: no-preference)",
-  ).matches
-) {
-  document.body.classList.add("cursor-enabled");
-  const dot = document.createElement("span"),
-    ring = document.createElement("span");
-  dot.className = "cursor-dot";
-  ring.className = "cursor-ring";
-  document.body.append(dot, ring);
-  addEventListener(
-    "pointermove",
-    (e) => {
-      dot.style.left = `${e.clientX}px`;
-      dot.style.top = `${e.clientY}px`;
-      ring.style.left = `${e.clientX}px`;
-      ring.style.top = `${e.clientY}px`;
-      dot.style.opacity = 1;
-      ring.style.opacity = 1;
-    },
-    { passive: true },
-  );
-  document.querySelectorAll("a,button,input,textarea").forEach((el) => {
-    el.addEventListener("mouseenter", () => ring.classList.add("hover"));
-    el.addEventListener("mouseleave", () => ring.classList.remove("hover"));
-  });
-}
-addEventListener("keydown", (event) => {
+mobileNav.addEventListener("change", () => setMenuOpen(false));
+
+document.querySelectorAll(".nav-link").forEach((link) => {
+  link.addEventListener("click", () => setMenuOpen(false));
+});
+
+document.addEventListener("keydown", (event) => {
   if (event.key === "Escape" && navMenu.classList.contains("open")) {
-    navMenu.classList.remove("open");
-    menuButton.classList.remove("open");
-    menuButton.setAttribute("aria-expanded", "false");
+    setMenuOpen(false);
     menuButton.focus();
   }
 });
-addEventListener("click", (event) => {
+
+document.addEventListener("click", (event) => {
   if (
     navMenu.classList.contains("open") &&
     !navMenu.contains(event.target) &&
     !menuButton.contains(event.target)
   ) {
-    navMenu.classList.remove("open");
-    menuButton.classList.remove("open");
-    menuButton.setAttribute("aria-expanded", "false");
+    setMenuOpen(false);
   }
+});
+
+if ("IntersectionObserver" in window) {
+  const revealObserver = new IntersectionObserver(
+    (entries, observer) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.12 },
+  );
+  document.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
+
+  const links = [...document.querySelectorAll(".nav-link")];
+  const sections = [...document.querySelectorAll("main section[id]")].filter((section) =>
+    links.some((link) => link.hash === "#" + section.id),
+  );
+  const sectionObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          links.forEach((link) => {
+            const active = link.hash === "#" + entry.target.id;
+            link.classList.toggle("active", active);
+            if (active) link.setAttribute("aria-current", "location");
+            else link.removeAttribute("aria-current");
+          });
+        }
+      });
+    },
+    { rootMargin: "-35% 0px -55%" },
+  );
+  sections.forEach((section) => sectionObserver.observe(section));
+
+  const hero = document.querySelector(".hero");
+  const backTopObserver = new IntersectionObserver(([entry]) => {
+    const visible = !entry.isIntersecting;
+    backTop.classList.toggle("visible", visible);
+    backTop.inert = !visible;
+    backTop.setAttribute("aria-hidden", String(!visible));
+  });
+  backTopObserver.observe(hero);
+} else {
+  document.querySelectorAll(".reveal").forEach((element) => element.classList.add("is-visible"));
+}
+
+backTop.addEventListener("click", () => {
+  const behavior = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth";
+  window.scrollTo({ top: 0, behavior });
+});
+
+document.querySelector("#year").textContent = new Date().getFullYear();
+
+document.querySelector(".contact-form").addEventListener("submit", (event) => {
+  event.preventDefault();
+  const form = event.currentTarget;
+  const fields = [...form.querySelectorAll("[required]")];
+  let firstInvalid = null;
+
+  fields.forEach((field) => {
+    const error = field.parentElement.querySelector("small");
+    let message = "";
+    if (!field.value.trim()) message = "Please enter your " + field.name + ".";
+    else if (field.type === "email" && !field.validity.valid) message = "Enter a valid email address.";
+
+    field.setAttribute("aria-invalid", String(Boolean(message)));
+    error.textContent = message;
+    if (message && !firstInvalid) firstInvalid = field;
+  });
+
+  const status = form.querySelector(".form-message");
+  if (firstInvalid) {
+    status.textContent = "Check the highlighted fields and try again.";
+    firstInvalid.focus();
+    return;
+  }
+
+  const name = form.elements.name.value.trim();
+  const email = form.elements.email.value.trim();
+  const message = form.elements.message.value.trim();
+  const subject = encodeURIComponent("Portfolio message from " + name);
+  const body = encodeURIComponent([message, "", "From: " + name, "Reply to: " + email].join("\n"));
+  status.textContent = "Your email app will open with a draft. Send it there to complete your message.";
+  window.location.href = "mailto:gunaseelan25122006@gmail.com?subject=" + subject + "&body=" + body;
 });
